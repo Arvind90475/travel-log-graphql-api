@@ -1,3 +1,4 @@
+import "dotenv/config";
 import "reflect-metadata";
 import {createConnection} from "typeorm";
 import { ApolloServer } from "apollo-server-express"
@@ -11,7 +12,8 @@ const main = async() => {
     const server = new ApolloServer({
         schema:  await buildSchema({
             resolvers:[userResolver]
-        })
+        }),
+        context: ({req,res}) => ({req,res})  
     });
     server.applyMiddleware({app})
     app.listen(4000, () => console.log('server has started on port 4000'));
