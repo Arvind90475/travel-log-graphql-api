@@ -1,5 +1,4 @@
 import { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions";
-
 const config: PostgresConnectionOptions = {
   type: "postgres",
   host: "localhost",
@@ -9,12 +8,12 @@ const config: PostgresConnectionOptions = {
   database: "type-graphql-typescript",
   synchronize: process.env.NODE_ENV === "development",
   logging: true,
-  entities: ["src/entity/**/*.ts"],
-  migrations: ["src/migration/**/*.ts"],
+  entities: ["dist/entity/*.js"],
+  migrations: ["dist/migration/**/*.js"],
   cli: {
-    entitiesDir: "src/entity",
-    migrationsDir: "src/migration",
-    subscribersDir: "src/subscriber",
+    entitiesDir: "entity",
+    migrationsDir: "migration",
+    subscribersDir: "subscriber",
   },
 };
 

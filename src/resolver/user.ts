@@ -1,29 +1,18 @@
 import * as bcrypt from "bcryptjs";
-import {
-  Arg,
-  Ctx,
-  Mutation,
-  Query,
-  Resolver,
-  UseMiddleware,
-} from "type-graphql";
+import { Arg, Mutation, Query, Resolver, UseMiddleware } from "type-graphql";
 
 import { User } from "../entity/User";
-import { LoginResponse, MyContext } from "../types";
+import { LoginResponse, UserRole } from "../types";
 import { signAccessToken } from "../helpers";
-import { isAuth } from "../middleware";
+import { checkRole } from "../middleware";
 
 @Resolver()
 class userResolver {
-  @Query(() => String)
-  hello(): string {
-    return "hello world";
-  }
-
-  @Query(() => String)
-  @UseMiddleware(isAuth)
-  protected(@Ctx() { payload }: MyContext) {
-    return `your user email is ${payload?.email}`;
+  // @ts-ignore
+  @UseMiddleware(checkRole("ADMIN"))
+  @Query(() => [User])
+  async users(): Promise<User[]> {
+    return User.find({});
   }
 
   @Mutation(() => User)
@@ -35,12 +24,13 @@ class userResolver {
     @Arg("phoneNumber", { nullable: true }) phoneNumber?: number
   ): Promise<User> {
     const hashedPassword = await bcrypt.hash(password, 8);
-    const user = await User.create({
+    const user = await User.create<User>({
       password: hashedPassword,
       firstName,
       lastName,
       phoneNumber,
       email,
+      role: UserRole.MODERATOR,
     }).save();
     return user;
   }
