@@ -8,8 +8,7 @@ import { checkRole } from "../middleware";
 
 @Resolver()
 class userResolver {
-  // @ts-ignore
-  @UseMiddleware(checkRole("ADMIN"))
+  @UseMiddleware(checkRole(UserRole.ADMIN))
   @Query(() => [User])
   async users(): Promise<User[]> {
     return User.find({});
