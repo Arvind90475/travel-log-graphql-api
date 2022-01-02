@@ -7,11 +7,11 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { UserRole } from "../types";
+import { UserRole } from "../helpers/types";
 
 registerEnumType(UserRole, {
   name: "UserRole",
-});
+})
 
 @ObjectType()
 @Entity()
@@ -34,7 +34,7 @@ export class User extends BaseEntity {
 
   @Field(() => Number, { nullable: true })
   @Column("numeric", { nullable: true })
-  phoneNumber?: number;
+  phoneNumber: number | null;
 
   @Column()
   password: string;

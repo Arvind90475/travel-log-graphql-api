@@ -1,5 +1,5 @@
 import { sign } from "jsonwebtoken";
-import { User } from "src/entity/User";
+import { User } from "src/entities/User";
 
 export function signAccessToken(user: User) {
   return sign(
