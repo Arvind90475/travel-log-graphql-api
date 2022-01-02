@@ -14,12 +14,10 @@ class userResolver {
   async users(): Promise<User[]> {
     return User.find({});
   }
-  
+
   @Mutation(() => User)
-  async register(
-    @Arg("options") userInput: UserInput,
-  ): Promise<User> {
-    const {password, firstName, lastName, phoneNumber,email} = userInput
+  async register(@Arg("options") userInput: UserInput): Promise<User> {
+    const { password, firstName, lastName, phoneNumber, email } = userInput;
     const hashedPassword = await bcrypt.hash(password, 8);
     const user = await User.create<User>({
       password: hashedPassword,
@@ -31,33 +29,32 @@ class userResolver {
     }).save();
     return user;
   }
-  
+
   @Mutation(() => LoginResponse)
   async login(
     @Arg("email") email: string,
     @Arg("password") password: string
-    ): Promise<LoginResponse> {
-      const user = await User.findOne({ where: { email } });
-      if (!user) throw new Error("Could not find user");
-      const valid = await bcrypt.compare(password, user.password);
-      if (!valid) throw new Error("wrong password");
-      // login successfully , send token
-      const accessToken = signAccessToken(user);
-      return {
-        accessToken,
-      };
+  ): Promise<LoginResponse> {
+    const user = await User.findOne({ where: { email } });
+    if (!user) throw new Error("Could not find user");
+    const valid = await bcrypt.compare(password, user.password);
+    if (!valid) throw new Error("wrong password");
+    // login successfully , send token
+    const accessToken = signAccessToken(user);
+    return {
+      accessToken,
+    };
+  }
+
+  @Query(() => [User])
+  async allUser(): Promise<User[]> {
+    try {
+      const users = await User.find({});
+      return users;
+    } catch (error) {
+      throw new Error(error);
     }
-    
-    @Query(() => [User])
-    async allUser(): Promise<User[]> {
-      try {
-        console.log('allUser query')
-        const users = await User.find({});
-        return users;
-      } catch (error) {
-        throw new Error(error)  
-      }
-    }
+  }
 }
 
 export default userResolver;

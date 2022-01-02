@@ -4,10 +4,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 import { UserRole } from "../helpers/types";
+import { LogEntry } from "./LogEntries";
 
 registerEnumType(UserRole, {
   name: "UserRole",
@@ -46,6 +48,9 @@ export class User extends BaseEntity {
     default: UserRole.USER,
   })
   role: UserRole;
+
+  @OneToMany(() => LogEntry, logEntry => logEntry.user)
+  logEntries: LogEntry[]
 
   @Field(() => Date)
   @CreateDateColumn()
