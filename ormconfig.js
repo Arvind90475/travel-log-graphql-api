@@ -9,7 +9,7 @@ module.exports = {
   entities: ["dist/entities/**/*.js"],
   migrationsTableName: "migrations",
   migrations: ["dist/migrations/*.js"],
-  synchronize: isDevelopmentEnvironment,
+  // synchronize: isDevelopmentEnvironment,
   migrationsRun: true,
   logging: isDevelopmentEnvironment,
   cli: {
