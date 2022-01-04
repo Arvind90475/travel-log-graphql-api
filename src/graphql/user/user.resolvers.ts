@@ -1,11 +1,13 @@
 import * as bcrypt from "bcryptjs";
-import { Arg, Mutation, Query, Resolver, UseMiddleware } from "type-graphql";
+import {Secret, sign} from 'jsonwebtoken'
+import { Arg, Ctx, Mutation, Query, Resolver, UseMiddleware } from "type-graphql";
 
 import { User } from "../../entities/User";
-import { LoginResponse, UserRole } from "../../helpers/types";
+import { IUserPayload, LoginResponse, MyContext, UserRole } from "../../helpers/types";
 import { signAccessToken } from "../../helpers";
 import { checkRole } from "../../middleware";
 import { UserInput } from "./types/user.types";
+
 
 @Resolver()
 class userResolver {
@@ -33,14 +35,20 @@ class userResolver {
   @Mutation(() => LoginResponse)
   async login(
     @Arg("email") email: string,
-    @Arg("password") password: string
+    @Arg("password") password: string,
+    @Ctx() context:MyContext
   ): Promise<LoginResponse> {
     const user = await User.findOne({ where: { email } });
     if (!user) throw new Error("Could not find user");
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) throw new Error("wrong password");
+    
     // login successfully , send token
     const accessToken = signAccessToken(user);
+    context.res.cookie("token",accessToken,{
+      maxAge: 60 * 60 * 24 * 1000, //one day in mili seconds
+      httpOnly: true,
+    })
     return {
       accessToken,
     };

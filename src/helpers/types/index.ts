@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response, CookieOptions } from "express";
 import { ObjectType, Field } from "type-graphql";
 
 @ObjectType()
@@ -7,12 +7,14 @@ export class LoginResponse {
   accessToken: string;
 }
 
-interface UserPayload extends Request {
-  user?: {
-    id: string;
-    role: "USER" | "ADMIN";
-  };
+export interface IUserPayload {
+  id: string;
+  role: "USER" | "ADMIN";
 }
+
+export type UserPayload = Request & { user?: IUserPayload } & {
+  cookies: Record<string, string>;
+};
 
 export interface MyContext {
   req: UserPayload;

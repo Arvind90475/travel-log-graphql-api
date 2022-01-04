@@ -9,25 +9,31 @@ import {
   UseMiddleware,
 } from "type-graphql";
 
-
 import { User } from "../../entities/User";
 import { LogEntry } from "../../entities/LogEntries";
 import { MyContext, UserRole } from "../../helpers/types";
 import { LogEntryInput } from "./types/logEntry.types";
-import { checkRole, isAuth } from "../../middleware"
+import { checkRole, isAuth } from "../../middleware";
 
 @Resolver((_) => LogEntry) //says which field its resolving for
 class LogEntryResolver {
-  
   @FieldResolver()
-  user(@Root() logEntry: LogEntry){
+  user(@Root() logEntry: LogEntry) {
     return User.findOne({ id: logEntry.userId });
   }
 
-  @UseMiddleware(checkRole(UserRole.ADMIN))
+  @UseMiddleware(checkRole(UserRole.USER))
   @Query(() => [LogEntry])
-  async allLogEntries(): Promise<LogEntry[]> {
-    return LogEntry.find({});
+  allLogEntries(@Ctx() { req }: MyContext): Promise<LogEntry[]> {
+    if (req.user?.role === "ADMIN") {
+      return LogEntry.find();
+    } else {
+      return LogEntry.find({
+        where: {
+          userId: req.user?.id,
+        },
+      });
+    }
   }
 
   @UseMiddleware(isAuth)

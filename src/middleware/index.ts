@@ -19,7 +19,8 @@ export const isAuth: MiddlewareFn<MyContext> = ({ context }, next) => {
 
 export const checkRole = (role: UserRole) => {
   const check: MiddlewareFn<MyContext> = ({ context }, next) => {
-    if (context.req.user && context.req.user.role === role) {
+    const user = context.req.user
+    if (user && (user.role === role || user.role === 'ADMIN') ) {
       return next();
     }
     throw new Error(`Unauthorized, You are not "${role}"`);
