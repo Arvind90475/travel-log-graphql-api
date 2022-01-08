@@ -4,6 +4,7 @@ import { createConnection } from "typeorm";
 import { ApolloServer } from "apollo-server-express";
 import * as express from "express";
 import * as cookieParser from "cookie-parser";
+import * as cors from "cors";
 import { buildSchema } from "type-graphql";
 
 import UserResolver from "./graphql/user/user.resolvers";
@@ -17,6 +18,14 @@ const main = async () => {
   const app = express();
   //@ts-ignore
   app.use(cookieParser());
+
+  app.use(
+    cors({
+      origin: "http://localhost:3000",
+      credentials: true,
+      exposedHeaders: ["set-cookie"],
+    })
+  );
 
   const server = new ApolloServer({
     schema: await buildSchema({
@@ -36,7 +45,7 @@ const main = async () => {
       return { req, res };
     },
   });
-  server.applyMiddleware({ app, path: "/graphql" });
+  server.applyMiddleware({ app, path: "/graphql", cors: false });
   app.listen(4000, () => console.log("server has started on port 4000"));
 };
 
