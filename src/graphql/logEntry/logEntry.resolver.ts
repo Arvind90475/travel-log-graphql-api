@@ -13,7 +13,7 @@ import { User } from "../../entities/User";
 import { LogEntry } from "../../entities/LogEntries";
 import { MyContext, UserRole } from "../../helpers/types";
 import { LogEntryInput } from "./types/logEntry.types";
-import { checkRole, isAuth } from "../../middleware";
+import { checkRole, isLoggedIn } from "../../middleware";
 
 @Resolver((_) => LogEntry) //says which field its resolving for
 class LogEntryResolver {
@@ -22,6 +22,7 @@ class LogEntryResolver {
     return User.findOne({ id: logEntry.userId });
   }
 
+  @UseMiddleware(isLoggedIn)
   @UseMiddleware(checkRole(UserRole.USER))
   @Query(() => [LogEntry])
   allLogEntries(@Ctx() { req }: MyContext): Promise<LogEntry[]> {
@@ -36,7 +37,7 @@ class LogEntryResolver {
     }
   }
 
-  @UseMiddleware(isAuth)
+  @UseMiddleware(isLoggedIn)
   @Mutation(() => LogEntry)
   async createLogEntry(
     @Arg("options") logEntryInput: LogEntryInput,

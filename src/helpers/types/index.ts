@@ -12,17 +12,14 @@ export interface IUserPayload {
   role: "USER" | "ADMIN";
 }
 
-export type UserPayload = Request & { user?: IUserPayload } & {
+export type UserPayload = { user?: IUserPayload } & {
   cookies: Record<string, string>;
 };
 
 export interface MyContext {
-  req: UserPayload;
+  req: Request & UserPayload;
   res: Response;
-  payload?: {
-    id: string;
-    role: "USER" | "ADMIN";
-  };
+  payload?: IUserPayload
 }
 
 export enum UserRole {
