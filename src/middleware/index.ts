@@ -1,23 +1,13 @@
-import { MiddlewareFn } from "type-graphql/dist/interfaces/Middleware";
-import { MyContext, UserRole } from "../helpers/types";
+import { AuthChecker } from "type-graphql";
+import { MyContext } from "../helpers/types";
 
-export const isLoggedIn: MiddlewareFn<MyContext> = ({ context }, next) => {
-  try {
-    if (!context.req.user) throw new Error();
-    return next();
-  } catch (error) {
-    context.res.status(401);
-    throw new Error("unAuthorised");
-  }
-};
+export const customAuthChecker: AuthChecker<MyContext> = (
+  { context },
+  roles
+) => {
+  const { user } = context;
+  if (!user) return false;
+  if (roles.length && !roles.includes(user.role)) return false;
 
-export const checkRole = (role: UserRole) => {
-  const check: MiddlewareFn<MyContext> = ({ context }, next) => {
-    const user = context.req.user;
-    if (user && (user.role === role || user.role === "ADMIN")) {
-      return next();
-    }
-    throw new Error(`Unauthorized, You are not "${role}"`);
-  };
-  return check;
+  return true;
 };

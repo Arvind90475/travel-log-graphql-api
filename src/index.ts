@@ -9,8 +9,8 @@ import { buildSchema } from "type-graphql";
 
 import UserResolver from "./graphql/user/user.resolvers";
 import LogEntryResolver from "./graphql/logEntry/logEntry.resolver";
-
 import { MyContext } from "./helpers/types";
+import { customAuthChecker } from "./middleware";
 import { verify } from "jsonwebtoken";
 
 const main = async () => {
@@ -30,21 +30,28 @@ const main = async () => {
   const server = new ApolloServer({
     schema: await buildSchema({
       resolvers: [UserResolver, LogEntryResolver],
+      globalMiddlewares: [],
+      authChecker: customAuthChecker,
     }),
-    context: ({ req, res }: MyContext) => {
+    context: (context: MyContext) => {
       try {
-        const token =
-          req.cookies["token"] || req.headers["authorization"]?.split(" ")[1];
+        const { req } = context;
+        const tokenFromCookie = req.cookies["token"];
+        const tokenFromHeader = req.headers["authorization"]?.split(" ")[1];
+        const token = tokenFromCookie || tokenFromHeader;
         if (token) {
-          const payload = verify(token, process.env.ACCESS_TOKEN_SECRET!);
-          req.user = payload as any;
+          //throws error if verify fails
+          context.user = verify(token, process.env.ACCESS_TOKEN_SECRET!) as any;
         }
       } catch (error) {
-        console.log(`error: ${error.message}`);
+        console.log(
+          `errored at checkTokenAndSetUser middleware: ${error.message}`
+        );
       }
-      return { req, res };
+      return context;
     },
   });
+
   server.applyMiddleware({ app, path: "/graphql", cors: false });
   app.listen(4000, () => console.log("server has started on port 4000"));
 };
