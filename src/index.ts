@@ -14,6 +14,7 @@ import { customAuthChecker } from "./middleware";
 import { verify } from "jsonwebtoken";
 
 const main = async () => {
+  const PORT = process.env.PORT || 4000
   await createConnection();
   const app = express();
   //@ts-ignore
@@ -56,7 +57,7 @@ const main = async () => {
   });
 
   server.applyMiddleware({ app, path: "/graphql", cors: false });
-  app.listen(4000, () => console.log("server has started on port 4000"));
+  app.listen(PORT, () => console.log(`server has started on port ${PORT}`));
 };
 
 main();
