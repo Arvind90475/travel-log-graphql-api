@@ -27,7 +27,7 @@ class LogEntryResolver {
     return User.findOne({ id: logEntry.userId });
   }
 
-  @Authorized(UserRole.ADMIN, UserRole.USER)
+  // @Authorized(UserRole.ADMIN, UserRole.USER)
   @Query(() => [LogEntry])
   async allLogEntries(@Ctx() context: MyContext): Promise<LogEntry[]> {
     let logEntries = [];
