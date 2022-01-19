@@ -16,8 +16,14 @@ import { LogEntryInput } from "./types/logEntry.types";
 
 @Resolver((_) => LogEntry) //says which field its resolving for
 class LogEntryResolver {
+  
   @FieldResolver()
   user(@Root() logEntry: LogEntry) {
+    return User.findOne({ id: logEntry.userId });
+  }
+
+  @FieldResolver()
+  createdBy(@Root() logEntry: LogEntry) {
     return User.findOne({ id: logEntry.userId });
   }
 

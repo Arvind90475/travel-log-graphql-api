@@ -47,18 +47,22 @@ export class LogEntry extends BaseEntity {
   @Column("date", { nullable: true })
   visitDate: Date;   //TODO: FIX:Me
 
-  @Field(() => Date)
-  @CreateDateColumn()
-  createdAt: Date;
-
+  
   @Field(() => ID)
   @Column("uuid", { name: "userId" })
   userId: string;
-
+  
   @Field(() => User)
   @ManyToOne(() => User, (user) => user.logEntries)
   @JoinColumn()
   user: User;
+  
+  @Field(() => User)
+  createdBy: User;
+  
+  @Field(() => Date)
+  @CreateDateColumn()
+  createdAt: Date;
 
   @Field(() => Date)
   @UpdateDateColumn()

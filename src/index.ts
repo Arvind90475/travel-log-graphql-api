@@ -21,7 +21,10 @@ const main = async () => {
 
   app.use(
     cors({
-      origin: process.env.ORIGIN_URL,
+      origin:
+        process.env.NODE_ENV === "development"
+          ? "http://localhost:3000"
+          : process.env.ORIGIN_URL,
       credentials: true,
       exposedHeaders: ["set-cookie"],
     })
