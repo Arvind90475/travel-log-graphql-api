@@ -17,6 +17,7 @@ const dbConfig = {
       }
     : {
         url: process.env!.DATABASE_URL,
+        ssl: { rejectUnauthorized: false },
       }),
   type: "postgres",
   entities: ["dist/entities/**/*.js"],
