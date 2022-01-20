@@ -37,6 +37,7 @@ const main = async () => {
       globalMiddlewares: [],
       authChecker: customAuthChecker,
     }),
+    introspection:true,
     playground: true,
     context: (context: MyContext) => {
       try {
