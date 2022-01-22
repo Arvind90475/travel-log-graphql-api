@@ -20,6 +20,9 @@ const main = async () => {
   //@ts-ignore
   app.use(cookieParser());
 
+  console.log('****',{env: process.env.NODE_ENV, 
+                     origin: process.env.ORIGIN_URL})
+
   app.use(
     cors({
       origin:
