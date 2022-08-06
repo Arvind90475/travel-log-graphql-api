@@ -63,6 +63,21 @@ class LogEntryResolver {
     });
     const hasNext = logEntries.length > queryLimit;
 
+    console.log({
+      logEntries: logEntries.slice(0, -1),
+      hasNext,
+      count: logEntries.length - 1,
+    })
+
+    console.log({
+      where: {
+        ...(!isAdmin && {
+          userId: context.user?.id,
+        }),
+      },
+      take: limitPlusOne,
+    })
+
     return {
       logEntries: logEntries.slice(0, -1),
       hasNext,
