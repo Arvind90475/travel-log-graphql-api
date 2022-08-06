@@ -16,6 +16,9 @@ import { LogEntry } from "../../entities/LogEntries";
 import { MyContext, UserRole } from "../../helpers/types";
 import { LogEntriesInput, LogEntryInput } from "./types/logEntry.types";
 
+function isNill(value: any) {
+  return value === null || value === undefined;
+}
 @ObjectType()
 class PaginatedLogEntries {
   @Field(() => [LogEntry])
@@ -48,8 +51,11 @@ class LogEntryResolver {
   ): Promise<PaginatedLogEntries> {
     //pagination logic
     const limit = logEntriesInput?.limit;
+    if ((!isNill(limit) && limit === 0) || limit! < 0)
+      throw new Error("Invalid value provided for limit");
+      
     const defaultLimit = 50;
-    const queryLimit = limit ? Math.min(limit,defaultLimit) : defaultLimit;
+    const queryLimit = limit ? Math.min(limit, defaultLimit) : defaultLimit;
     const limitPlusOne = queryLimit + 1;
 
     const isAdmin = context.user?.role === "ADMIN";
@@ -63,10 +69,11 @@ class LogEntryResolver {
     });
     const hasNext = logEntries.length > queryLimit;
 
+    const newLogEntries = logEntries.slice(0, -1);
     return {
-      logEntries: logEntries.slice(0, -1),
+      logEntries: newLogEntries,
       hasNext,
-      count: logEntries.length - 1,
+      count: newLogEntries.length,
     };
   }
 
