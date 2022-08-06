@@ -1,5 +1,5 @@
 import { LogEntry } from "../../../entities/LogEntries";
-import { InputType, Field } from "type-graphql";
+import { InputType, Field, Int } from "type-graphql";
 
 @InputType()
 export class LogEntryInput implements Partial<LogEntry> {
@@ -20,4 +20,11 @@ export class LogEntryInput implements Partial<LogEntry> {
     
     @Field(() => Date, {nullable:true}) //TODO: fixme
     visitDate: Date
+}
+
+
+@InputType()
+export class LogEntriesInput {
+    @Field(() => Int, {nullable:true})
+    limit: number | null
 }

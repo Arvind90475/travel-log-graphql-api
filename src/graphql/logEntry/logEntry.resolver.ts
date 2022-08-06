@@ -2,8 +2,10 @@ import {
   Arg,
   Authorized,
   Ctx,
+  Field,
   FieldResolver,
   Mutation,
+  ObjectType,
   Query,
   Resolver,
   Root,
@@ -12,11 +14,22 @@ import {
 import { User } from "../../entities/User";
 import { LogEntry } from "../../entities/LogEntries";
 import { MyContext, UserRole } from "../../helpers/types";
-import { LogEntryInput } from "./types/logEntry.types";
+import { LogEntriesInput, LogEntryInput } from "./types/logEntry.types";
+
+@ObjectType()
+class PaginatedLogEntries {
+  @Field(() => [LogEntry])
+  logEntries: LogEntry[];
+
+  @Field()
+  hasNext: boolean;
+
+  @Field()
+  count: Number;
+}
 
 @Resolver((_) => LogEntry) //says which field its resolving for
 class LogEntryResolver {
-  
   @FieldResolver()
   user(@Root() logEntry: LogEntry) {
     return User.findOne({ id: logEntry.userId });
@@ -28,19 +41,33 @@ class LogEntryResolver {
   }
 
   // @Authorized(UserRole.ADMIN, UserRole.USER)
-  @Query(() => [LogEntry])
-  async allLogEntries(@Ctx() context: MyContext): Promise<LogEntry[]> {
-    let logEntries = [];
-    if (context.user?.role === "ADMIN") {
-      logEntries = await LogEntry.find();
-    } else {
-      logEntries = await LogEntry.find({
-        where: {
+  @Query(() => PaginatedLogEntries)
+  async allLogEntries(
+    @Arg("options", { nullable: true }) logEntriesInput: LogEntriesInput,
+    @Ctx() context: MyContext
+  ): Promise<PaginatedLogEntries> {
+    //pagination logic
+    const limit = logEntriesInput?.limit;
+    const defaultLimit = 50;
+    const queryLimit = limit ? Math.min(limit,defaultLimit) : defaultLimit;
+    const limitPlusOne = queryLimit + 1;
+
+    const isAdmin = context.user?.role === "ADMIN";
+    const logEntries = await LogEntry.find({
+      where: {
+        ...(!isAdmin && {
           userId: context.user?.id,
-        },
-      });
-    }
-    return logEntries;
+        }),
+      },
+      take: limitPlusOne,
+    });
+    const hasNext = logEntries.length > queryLimit;
+
+    return {
+      logEntries: logEntries.slice(0, -1),
+      hasNext,
+      count: logEntries.length - 1,
+    };
   }
 
   @Authorized()

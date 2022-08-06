@@ -19,10 +19,6 @@ const main = async () => {
   const app = express();
   //@ts-ignore
   app.use(cookieParser());
-
-  console.log('****',{env: process.env.NODE_ENV, 
-                     origin: process.env.ORIGIN_URL})
-
   app.use(
     cors({
       origin:
@@ -62,7 +58,9 @@ const main = async () => {
   });
 
   server.applyMiddleware({ app, path: "/graphql", cors: false });
-  app.listen(PORT, () => console.log(`server has started on port ${PORT}`));
+  app.listen(PORT, () => console.log(`server has started on : http://localhost:${PORT}`));
 };
 
-main();
+main().catch(e => {
+  console.error(`errored : ${e}`)
+});

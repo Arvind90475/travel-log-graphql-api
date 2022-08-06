@@ -47,6 +47,7 @@ class userResolver {
     context.res.cookie("token", accessToken, {
       maxAge: 60 * 60 * 24 * 1000, //one day in mili seconds
       httpOnly: true,
+      
     });
     return {
       accessToken,
