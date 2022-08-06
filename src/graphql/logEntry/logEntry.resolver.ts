@@ -63,26 +63,6 @@ class LogEntryResolver {
     });
     const hasNext = logEntries.length > queryLimit;
 
-    console.log({
-      logEntries: logEntries.slice(0, -1),
-      hasNext,
-      count: logEntries.length - 1,
-    })
-
-    console.log({
-      where: {
-        ...(!isAdmin && {
-          userId: context.user?.id,
-        }),
-      },
-      take: limitPlusOne,
-    })
-
-    console.log('allData:')
-    console.log({
-      data: await LogEntry.find()
-    })
-
     return {
       logEntries: logEntries.slice(0, -1),
       hasNext,
