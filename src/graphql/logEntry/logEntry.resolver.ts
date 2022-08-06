@@ -78,6 +78,11 @@ class LogEntryResolver {
       take: limitPlusOne,
     })
 
+    console.log('allData:')
+    console.log({
+      data: await LogEntry.find()
+    })
+
     return {
       logEntries: logEntries.slice(0, -1),
       hasNext,
